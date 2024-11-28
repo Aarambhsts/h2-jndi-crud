@@ -1,4 +1,4 @@
-package com.example.sample;
+package com.unisys.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

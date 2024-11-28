@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class H2JndiCrudApplicationTests {
 
 	@Test
-	void contextLoads() {
+	void contextLoads() { //demotest
 	}
 
 }

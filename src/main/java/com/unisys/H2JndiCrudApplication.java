@@ -1,4 +1,4 @@
-package com.example.sample;
+package com.unisys;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

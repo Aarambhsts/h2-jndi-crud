@@ -1,4 +1,4 @@
-package com.example.sample;
+package com.unisys;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,7 +16,7 @@ public class DatabaseTestController {
     @GetMapping("/test")
     public String testDatabaseConnection() {
         try {
-            // Simple test query
+            
             List<String> results = jdbcTemplate.queryForList("SELECT 1", String.class);
             return "Database connection successful! Test query result: " + results;
         } catch (Exception e) {
