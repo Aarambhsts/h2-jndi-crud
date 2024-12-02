@@ -8,15 +8,29 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object (DAO) for performing CRUD operations on the Employee entity.
+ * This class interacts with the database using JDBC to persist and retrieve Employee objects.
+ */
 @Repository
 public class EmployeeDAO {
 
     private final DataSource dataSource;
 
+    /**
+     * Constructor that initializes the EmployeeDAO with the provided DataSource.
+     *
+     * @param dataSource the DataSource used to get database connections.
+     */
     public EmployeeDAO(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
+    /**
+     * Saves the given Employee object to the database.
+     * 
+     * @param employee the Employee object to be saved.
+     */
     public void save(Employee employee) {
         String sql = "INSERT INTO EMPLOYEE (ID, NAME, EMAIL) VALUES (?, ?, ?)";
         try (Connection connection = dataSource.getConnection();
@@ -30,6 +44,11 @@ public class EmployeeDAO {
         }
     }
 
+    /**
+     * Retrieves all Employee records from the database.
+     *
+     * @return a list of all Employees in the database.
+     */
     public List<Employee> findAll() {
         String sql = "SELECT * FROM EMPLOYEE";
         List<Employee> employees = new ArrayList<>();
@@ -49,6 +68,12 @@ public class EmployeeDAO {
         return employees;
     }
 
+    /**
+     * Retrieves an Employee by their ID from the database.
+     *
+     * @param id the ID of the Employee to be retrieved.
+     * @return the Employee with the specified ID, or null if not found.
+     */
     public Employee findById(Long id) {
         String sql = "SELECT * FROM EMPLOYEE WHERE ID = ?";
         try (Connection connection = dataSource.getConnection();
@@ -69,6 +94,11 @@ public class EmployeeDAO {
         return null;
     }
 
+    /**
+     * Updates the details of an existing Employee in the database.
+     * 
+     * @param employee the Employee object containing the updated details.
+     */
     public void update(Employee employee) {
         String sql = "UPDATE EMPLOYEE SET NAME = ?, EMAIL = ? WHERE ID = ?";
         try (Connection connection = dataSource.getConnection();
@@ -82,6 +112,11 @@ public class EmployeeDAO {
         }
     }
 
+    /**
+     * Deletes the Employee with the specified ID from the database.
+     * 
+     * @param id the ID of the Employee to be deleted.
+     */
     public void deleteById(Long id) {
         String sql = "DELETE FROM EMPLOYEE WHERE ID = ?";
         try (Connection connection = dataSource.getConnection();
