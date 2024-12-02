@@ -3,21 +3,21 @@ package com.unisys.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import com.unisys.dao.EmployeeDAO;
+import com.unisys.service.EmployeeService;
 import com.unisys.model.Employee;
 
 import java.util.List;
 
 /**
  * Controller class that handles HTTP requests related to Employee resources.
- * This class provides CRUD operations for Employee objects through the EmployeeDAO.
+ * This class provides CRUD operations for Employee objects through the EmployeeService.
  */
 @RestController
 @RequestMapping("/api/employees")
 @RequiredArgsConstructor
 public class EmployeeController {
 
-    private final EmployeeDAO employeeDAO;
+    private final EmployeeService employeeService;
 
     /**
      * Handles the creation of a new Employee.
@@ -26,7 +26,7 @@ public class EmployeeController {
      */
     @PostMapping
     public void createEmployee(@RequestBody Employee employee) {
-        employeeDAO.save(employee);
+        employeeService.saveEmployee(employee);
     }
 
     /**
@@ -36,7 +36,7 @@ public class EmployeeController {
      */
     @GetMapping
     public List<Employee> getAllEmployees() {
-        return employeeDAO.findAll();
+        return employeeService.getAllEmployees();
     }
 
     /**
@@ -47,7 +47,7 @@ public class EmployeeController {
      */
     @GetMapping("/{id}")
     public Employee getEmployeeById(@PathVariable Long id) {
-        return employeeDAO.findById(id);
+        return employeeService.getEmployeeById(id);
     }
 
     /**
@@ -59,7 +59,7 @@ public class EmployeeController {
     @PutMapping("/{id}")
     public void updateEmployee(@PathVariable Long id, @RequestBody Employee employee) {
         employee.setId(id);
-        employeeDAO.update(employee);
+        employeeService.updateEmployee(employee);
     }
 
     /**
@@ -69,6 +69,6 @@ public class EmployeeController {
      */
     @DeleteMapping("/{id}")
     public void deleteEmployee(@PathVariable Long id) {
-        employeeDAO.deleteById(id);
+        employeeService.deleteEmployee(id);
     }
 }
