@@ -6,7 +6,7 @@ import com.unisys.model.Employee;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -15,11 +15,17 @@ import java.util.List;
  * This class provides CRUD operations for Employee objects through the EmployeeService.
  */
 @Path("/api/employees")
-@RequiredArgsConstructor
+@Component // Marks this class as a Spring-managed bean
 public class EmployeeController {
 
     private final EmployeeService employeeService;
     private final EmailService emailService;
+
+    // Constructor for dependency injection
+    public EmployeeController(EmployeeService employeeService, EmailService emailService) {
+        this.employeeService = employeeService;
+        this.emailService = emailService;
+    }
 
     /**
      * Handles the creation of a new Employee.
