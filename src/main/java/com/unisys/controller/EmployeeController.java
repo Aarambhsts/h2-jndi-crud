@@ -6,6 +6,7 @@ import com.unisys.model.Employee;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,11 +21,13 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
     private final EmailService emailService;
+    private final JmsTemplate jmsTemplate; // Injected JmsTemplate
 
     // Constructor for dependency injection
-    public EmployeeController(EmployeeService employeeService, EmailService emailService) {
+    public EmployeeController(EmployeeService employeeService, EmailService emailService, JmsTemplate jmsTemplate) {
         this.employeeService = employeeService;
         this.emailService = emailService;
+        this.jmsTemplate = jmsTemplate;
     }
 
     /**
@@ -41,6 +44,9 @@ public class EmployeeController {
         String emailSubject = "New Employee Created";
         String emailText = "An employee with ID " + employee.getId() + " has been created.";
         emailService.sendSimpleEmail("aadia2411@gmail.com", emailSubject, emailText);
+
+        // Send a message to the queue after creating the employee
+        jmsTemplate.convertAndSend("employeeQueue", "Employee Created: " + employee.getId());
     }
 
     /**
@@ -84,6 +90,9 @@ public class EmployeeController {
         String emailSubject = "Employee Updated";
         String emailText = "Employee with ID " + id + " has been updated.";
         emailService.sendSimpleEmail("aadia2411@gmail.com", emailSubject, emailText);
+
+        // Send a message to the queue after updating the employee
+        jmsTemplate.convertAndSend("employeeQueue", "Employee Updated: " + id);
     }
 
     /**
@@ -100,5 +109,8 @@ public class EmployeeController {
         String emailSubject = "Employee Deleted";
         String emailText = "Employee with ID " + id + " has been deleted.";
         emailService.sendSimpleEmail("aadia2411@gmail.com", emailSubject, emailText);
+
+        // Send a message to the queue after deleting the employee
+        jmsTemplate.convertAndSend("employeeQueue", "Employee Deleted: " + id);
     }
 }
