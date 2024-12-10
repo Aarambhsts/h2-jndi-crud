@@ -1,116 +1,130 @@
 package com.unisys.controller;
 
+import com.unisys.model.Employee;
 import com.unisys.service.EmployeeService;
 import com.unisys.service.EmailService;
-import com.unisys.model.Employee;
-
+import com.unisys.exception.EmployeeNotFoundException;
+import com.unisys.exception.ValidationException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-/**
- * Controller class that handles HTTP requests related to Employee resources.
- * This class provides CRUD operations for Employee objects through the EmployeeService.
- */
 @Path("/api/employees")
-@Component // Marks this class as a Spring-managed bean
+@Component
 public class EmployeeController {
+
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
+
+    // Define constants for repeated values
+    private static final String EMPLOYEE_EMAIL = "aadia2411@gmail.com";
+    private static final String EMPLOYEE_QUEUE = "employeeQueue";
+    private static final String EMPLOYEE_ID_MESSAGE = "Employee with ID ";
 
     private final EmployeeService employeeService;
     private final EmailService emailService;
-    private final JmsTemplate jmsTemplate; // Injected JmsTemplate
+    private final JmsTemplate jmsTemplate;
 
-    // Constructor for dependency injection
+    // Constructor injection for dependencies
     public EmployeeController(EmployeeService employeeService, EmailService emailService, JmsTemplate jmsTemplate) {
         this.employeeService = employeeService;
         this.emailService = emailService;
         this.jmsTemplate = jmsTemplate;
     }
 
-    /**
-     * Handles the creation of a new Employee.
-     *
-     * @param employee the Employee object to be created.
-     */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public void createEmployee(Employee employee) {
+    public Response createEmployee(Employee employee) {
+        if (employee == null || employee.getId() == null || employee.getName() == null || employee.getEmail() == null) {
+            throw new ValidationException("Employee data is incomplete.");
+        }
+
+        // Log the creation of an employee
+        logger.info("Creating new employee with ID: {}", employee.getId());
+
         employeeService.saveEmployee(employee);
 
-        // Send email notification after creating the employee
-        String emailSubject = "New Employee Created";
-        String emailText = "An employee with ID " + employee.getId() + " has been created.";
-        emailService.sendSimpleEmail("aadia2411@gmail.com", emailSubject, emailText);
+        // Send email and message to the queue
+        emailService.sendSimpleEmail(
+            EMPLOYEE_EMAIL, 
+            "New Employee Created", 
+            EMPLOYEE_ID_MESSAGE + employee.getId() + " has been created."
+        );
+        jmsTemplate.convertAndSend(EMPLOYEE_QUEUE, "Employee Created: " + employee.getId());
 
-        // Send a message to the queue after creating the employee
-        jmsTemplate.convertAndSend("employeeQueue", "Employee Created: " + employee.getId());
+        return Response.status(Response.Status.CREATED).entity("Employee created successfully.").build();
     }
 
-    /**
-     * Retrieves all Employees from the database.
-     *
-     * @return a list of all Employees.
-     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Employee> getAllEmployees() {
         return employeeService.getAllEmployees();
     }
 
-    /**
-     * Retrieves a specific Employee by their ID.
-     *
-     * @param id the ID of the Employee to retrieve.
-     * @return the Employee with the specified ID.
-     */
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Employee getEmployeeById(@PathParam("id") Long id) {
-        return employeeService.getEmployeeById(id);
+        Employee employee = employeeService.getEmployeeById(id);
+        if (employee == null) {
+            throw new EmployeeNotFoundException(EMPLOYEE_ID_MESSAGE + id + " not found.");
+        }
+
+        // Log the retrieval of an employee
+        logger.info("Retrieved employee with ID: {}", id);
+
+        return employee;
     }
 
-    /**
-     * Updates an existing Employee's information.
-     *
-     * @param id       the ID of the Employee to update.
-     * @param employee the updated Employee object.
-     */
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void updateEmployee(@PathParam("id") Long id, Employee employee) {
+    public Response updateEmployee(@PathParam("id") Long id, Employee employee) {
+        if (employee == null) {
+            throw new ValidationException("Employee data is missing.");
+        }
         employee.setId(id);
         employeeService.updateEmployee(employee);
 
-        // Send email notification after updating the employee
-        String emailSubject = "Employee Updated";
-        String emailText = "Employee with ID " + id + " has been updated.";
-        emailService.sendSimpleEmail("aadia2411@gmail.com", emailSubject, emailText);
+        // Send email and message to the queue
+        emailService.sendSimpleEmail(
+            EMPLOYEE_EMAIL, 
+            "Employee Updated", 
+            EMPLOYEE_ID_MESSAGE + id + " has been updated."
+        );
+        jmsTemplate.convertAndSend(EMPLOYEE_QUEUE, "Employee Updated: " + id);
 
-        // Send a message to the queue after updating the employee
-        jmsTemplate.convertAndSend("employeeQueue", "Employee Updated: " + id);
+        // Log the update of an employee
+        logger.info("Updated employee with ID: {}", id);
+
+        return Response.ok("Employee updated successfully.").build();
     }
 
-    /**
-     * Deletes an Employee by their ID.
-     *
-     * @param id the ID of the Employee to delete.
-     */
     @DELETE
     @Path("/{id}")
-    public void deleteEmployee(@PathParam("id") Long id) {
+    public Response deleteEmployee(@PathParam("id") Long id) {
+        Employee existingEmployee = employeeService.getEmployeeById(id);
+        if (existingEmployee == null) {
+            throw new EmployeeNotFoundException(EMPLOYEE_ID_MESSAGE + id + " not found.");
+        }
         employeeService.deleteEmployee(id);
 
-        // Send email notification after deleting the employee
-        String emailSubject = "Employee Deleted";
-        String emailText = "Employee with ID " + id + " has been deleted.";
-        emailService.sendSimpleEmail("aadia2411@gmail.com", emailSubject, emailText);
+        // Send email and message to the queue
+        emailService.sendSimpleEmail(
+            EMPLOYEE_EMAIL, 
+            "Employee Deleted", 
+            EMPLOYEE_ID_MESSAGE + id + " has been deleted."
+        );
+        jmsTemplate.convertAndSend(EMPLOYEE_QUEUE, "Employee Deleted: " + id);
 
-        // Send a message to the queue after deleting the employee
-        jmsTemplate.convertAndSend("employeeQueue", "Employee Deleted: " + id);
+        // Log the deletion of an employee
+        logger.info("Deleted employee with ID: {}", id);
+
+        return Response.ok("Employee deleted successfully.").build();
     }
 }

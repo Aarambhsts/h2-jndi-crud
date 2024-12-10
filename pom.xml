@@ -48,10 +48,9 @@
     	<dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-activemq</artifactId>
-    <version>3.4.0</version> 
-</dependency>
+	</dependency>
 
-<dependency>
+	<dependency>
     <groupId>org.glassfish.jersey.media</groupId>
     <artifactId>jersey-media-json-jackson</artifactId>
 </dependency>
@@ -59,7 +58,6 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-jersey</artifactId>
 </dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -79,6 +77,8 @@
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
     </dependency>
+   
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -118,6 +118,31 @@
         <groupId>jakarta.mail</groupId>
         <artifactId>jakarta.mail-api</artifactId>
         </dependency>
+       <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+<dependency>
+    <groupId>io.micrometer</groupId>
+    <artifactId>micrometer-registry-prometheus</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-aop</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-api</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-logging</artifactId>
+</dependency>
+ <dependency>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+             <scope>provided</scope>
+    </dependency>
 
 	</dependencies>
 

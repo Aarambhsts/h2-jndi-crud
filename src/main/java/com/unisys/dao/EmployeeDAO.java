@@ -30,6 +30,7 @@ public class EmployeeDAO {
      * Saves the given Employee object to the database.
      * 
      * @param employee the Employee object to be saved.
+     * @throws EmployeeDAOException if an error occurs during saving.
      */
     public void save(Employee employee) {
         String sql = "INSERT INTO EMPLOYEE (ID, NAME, EMAIL) VALUES (?, ?, ?)";
@@ -40,7 +41,7 @@ public class EmployeeDAO {
             preparedStatement.setString(3, employee.getEmail());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Error saving employee: " + e.getMessage(), e);
+            throw new EmployeeDAOException("Error saving employee: " + e.getMessage(), e);
         }
     }
 
@@ -48,9 +49,11 @@ public class EmployeeDAO {
      * Retrieves all Employee records from the database.
      *
      * @return a list of all Employees in the database.
+     * @throws EmployeeDAOException if an error occurs during fetching.
      */
     public List<Employee> findAll() {
-        String sql = "SELECT * FROM EMPLOYEE";
+        // Replace "SELECT *" with explicit column names
+        String sql = "SELECT ID, NAME, EMAIL FROM EMPLOYEE";
         List<Employee> employees = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -63,7 +66,7 @@ public class EmployeeDAO {
                 employees.add(employee);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error fetching employees: " + e.getMessage(), e);
+            throw new EmployeeDAOException("Error fetching employees: " + e.getMessage(), e);
         }
         return employees;
     }
@@ -73,9 +76,11 @@ public class EmployeeDAO {
      *
      * @param id the ID of the Employee to be retrieved.
      * @return the Employee with the specified ID, or null if not found.
+     * @throws EmployeeDAOException if an error occurs during retrieval.
      */
     public Employee findById(Long id) {
-        String sql = "SELECT * FROM EMPLOYEE WHERE ID = ?";
+        // Replace "SELECT *" with explicit column names
+        String sql = "SELECT ID, NAME, EMAIL FROM EMPLOYEE WHERE ID = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
@@ -89,7 +94,7 @@ public class EmployeeDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error finding employee by ID: " + e.getMessage(), e);
+            throw new EmployeeDAOException("Error finding employee by ID: " + e.getMessage(), e);
         }
         return null;
     }
@@ -98,6 +103,7 @@ public class EmployeeDAO {
      * Updates the details of an existing Employee in the database.
      * 
      * @param employee the Employee object containing the updated details.
+     * @throws EmployeeDAOException if an error occurs during updating.
      */
     public void update(Employee employee) {
         String sql = "UPDATE EMPLOYEE SET NAME = ?, EMAIL = ? WHERE ID = ?";
@@ -108,7 +114,7 @@ public class EmployeeDAO {
             preparedStatement.setLong(3, employee.getId());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Error updating employee: " + e.getMessage(), e);
+            throw new EmployeeDAOException("Error updating employee: " + e.getMessage(), e);
         }
     }
 
@@ -116,6 +122,7 @@ public class EmployeeDAO {
      * Deletes the Employee with the specified ID from the database.
      * 
      * @param id the ID of the Employee to be deleted.
+     * @throws EmployeeDAOException if an error occurs during deletion.
      */
     public void deleteById(Long id) {
         String sql = "DELETE FROM EMPLOYEE WHERE ID = ?";
@@ -124,7 +131,16 @@ public class EmployeeDAO {
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Error deleting employee by ID: " + e.getMessage(), e);
+            throw new EmployeeDAOException("Error deleting employee by ID: " + e.getMessage(), e);
         }
+    }
+}
+
+/**
+ * Custom exception for handling EmployeeDAO errors.
+ */
+class EmployeeDAOException extends RuntimeException {
+    public EmployeeDAOException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

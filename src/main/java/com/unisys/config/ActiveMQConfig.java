@@ -14,13 +14,13 @@ import jakarta.jms.ConnectionFactory;
 public class ActiveMQConfig {
 
     // Define the ConnectionFactory bean
-    @Bean	
+    @Bean
     public ConnectionFactory connectionFactory() {
         // Create an ActiveMQConnectionFactory instance and provide the broker URL
         ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
 
         // Optionally, wrap it with CachingConnectionFactory to improve performance
-        return (ConnectionFactory) new CachingConnectionFactory(activeMQConnectionFactory);
+        return new CachingConnectionFactory(activeMQConnectionFactory);
     }
 
     // Define the JmsTemplate bean

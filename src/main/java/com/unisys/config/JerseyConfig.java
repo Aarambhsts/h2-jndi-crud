@@ -1,13 +1,11 @@
 package com.unisys.config;
 
 import org.glassfish.jersey.server.ResourceConfig;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-@Configuration
+@Component
 public class JerseyConfig extends ResourceConfig {
     public JerseyConfig() {
-    	
-        packages("com.unisys.controller"); // Register Jersey resource package
+        packages("com.unisys.controller", "com.unisys.exception");
     }
 }
-

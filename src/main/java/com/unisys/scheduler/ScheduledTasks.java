@@ -1,17 +1,21 @@
 package com.unisys.scheduler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ScheduledTasks {
 
+    private static final Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
+
     /**
-     * This method will run every 10 seconds.
+     * This method will run every 100 seconds.
      */
-    @Scheduled(fixedRate = 10000) // Runs every 10 seconds
-    public void performTaskEvery10Seconds() {
-        System.out.println("Task executed every 10 seconds");
+    @Scheduled(fixedRate = 100000) // Runs every 100 seconds
+    public void performTaskEvery100Seconds() {
+        logger.info("Task executed every 100 seconds");
         // Add your task logic here
     }
 
@@ -20,7 +24,7 @@ public class ScheduledTasks {
      */
     @Scheduled(cron = "0 0 8 * * ?") // Runs at 8 AM every day
     public void performTaskAt8AM() {
-        System.out.println("Task executed at 8 AM every day");
+        logger.info("Task executed at 8 AM every day");
         // Add your task logic here
     }
 }
